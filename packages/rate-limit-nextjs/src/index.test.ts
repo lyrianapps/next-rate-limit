@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { RateLimitStore } from "@lyrianapps/rate-limit";
+import type { RateLimitStore } from "@lyrianappsdev/rate-limit";
 import { withRateLimit, type WithRateLimitOptions } from "./index.js";
 
 // ─── next/server mock ─────────────────────────────────────────────────────────

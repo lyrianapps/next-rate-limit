@@ -7,5 +7,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   splitting: false,
-  external: ["next", "next/server", "@lyrianapps/rate-limit"],
+  external: ["next", "next/server", "@lyrianappsdev/rate-limit"],
 });

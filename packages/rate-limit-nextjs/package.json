@@ -1,7 +1,7 @@
 {
-  "name": "@lyrianapps/rate-limit-nextjs",
+  "name": "@lyrianappsdev/rate-limit-nextjs",
   "version": "0.1.0",
-  "description": "Next.js App Router adapter for @lyrianapps/rate-limit.",
+  "description": "Next.js App Router adapter for @lyrianappsdev/rate-limit.",
   "keywords": [
     "rate-limit",
     "nextjs",
@@ -29,7 +29,6 @@
     "dist"
   ],
   "publishConfig": {
-    "registry": "https://your-artifactory-instance/artifactory/api/npm/npm-local/",
     "access": "public"
   },
   "scripts": {
@@ -41,11 +40,11 @@
     "lint": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@lyrianapps/rate-limit": "*",
+    "@lyrianappsdev/rate-limit": "*",
     "next": ">=14.0.0"
   },
   "devDependencies": {
-    "@lyrianapps/rate-limit": "*",
+    "@lyrianappsdev/rate-limit": "*",
     "next": "^15.3.2",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3"

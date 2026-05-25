@@ -1,14 +1,14 @@
-# @lyrianapps/rate-limit
+# @lyrianappsdev/rate-limit
 
 Fixed-window rate limiting for Next.js App Router, built as two publishable packages:
 
-- **`@lyrianapps/rate-limit`** — framework-agnostic core, zero runtime dependencies
-- **`@lyrianapps/rate-limit-nextjs`** — Next.js App Router adapter, re-exports everything from core
+- **`@lyrianappsdev/rate-limit`** — framework-agnostic core, zero runtime dependencies
+- **`@lyrianappsdev/rate-limit-nextjs`** — Next.js App Router adapter, re-exports everything from core
 
 ## Installation
 
 ```bash
-npm install @lyrianapps/rate-limit-nextjs
+npm install @lyrianappsdev/rate-limit-nextjs
 # Production Redis support
 npm install ioredis
 ```
@@ -17,7 +17,7 @@ npm install ioredis
 
 ```ts
 // app/api/hello/route.ts
-import { withRateLimit } from "@lyrianapps/rate-limit-nextjs";
+import { withRateLimit } from "@lyrianappsdev/rate-limit-nextjs";
 import { NextResponse } from "next/server";
 
 export const GET = withRateLimit(async (request) => {
@@ -32,7 +32,7 @@ Defaults to **60 req / 60 s**, keyed by IP. All responses include `X-RateLimit-*
 ### MemoryStore — development only
 
 ```ts
-import { MemoryStore } from "@lyrianapps/rate-limit-nextjs";
+import { MemoryStore } from "@lyrianappsdev/rate-limit-nextjs";
 const store = new MemoryStore();
 ```
 
@@ -43,7 +43,7 @@ const store = new MemoryStore();
 ```ts
 // lib/rate-limit-store.ts
 import Redis from "ioredis";
-import { RedisStore } from "@lyrianapps/rate-limit-nextjs";
+import { RedisStore } from "@lyrianappsdev/rate-limit-nextjs";
 
 const redis = new Redis(process.env.REDIS_URL!, {
   lazyConnect: true,
@@ -57,7 +57,7 @@ export const store = new RedisStore(redis);
 
 ```ts
 // app/api/hello/route.ts
-import { withRateLimit } from "@lyrianapps/rate-limit-nextjs";
+import { withRateLimit } from "@lyrianappsdev/rate-limit-nextjs";
 import { store } from "@/lib/rate-limit-store";
 
 export const POST = withRateLimit(handler, { store, limit: 20, windowMs: 60_000 });
@@ -100,7 +100,7 @@ export const POST = withRateLimit(handler, {
 ## Core API (framework-agnostic)
 
 ```ts
-import { rateLimit, createRateLimiter } from "@lyrianapps/rate-limit";
+import { rateLimit, createRateLimiter } from "@lyrianappsdev/rate-limit";
 
 // One-off check
 const result = await rateLimit(store, `ip:${ip}`, { limit: 60, windowMs: 60_000 });
@@ -132,7 +132,7 @@ const result = await authLimiter(`login:${ip}`);
 ## Custom store
 
 ```ts
-import type { RateLimitStore } from "@lyrianapps/rate-limit";
+import type { RateLimitStore } from "@lyrianappsdev/rate-limit";
 
 class MyStore implements RateLimitStore {
   async increment(key: string, windowMs: number) {

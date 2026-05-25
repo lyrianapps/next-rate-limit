@@ -1,8 +1,8 @@
 // =============================================================================
-// @lyrianapps/rate-limit-nextjs
+// @lyrianappsdev/rate-limit-nextjs
 //
-// Next.js App Router adapter for @lyrianapps/rate-limit.
-// Peer dependencies: next >= 14, @lyrianapps/rate-limit
+// Next.js App Router adapter for @lyrianappsdev/rate-limit.
+// Peer dependencies: next >= 14, @lyrianappsdev/rate-limit
 // =============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
@@ -11,21 +11,21 @@ import {
   type RateLimitStore,
   MemoryStore,
   rateLimit,
-} from "@lyrianapps/rate-limit";
+} from "@lyrianappsdev/rate-limit";
 
 // Re-export core primitives so consumers only need one import.
 export type {
   RateLimitConfig,
   RateLimitResult,
   RateLimitStore,
-} from "@lyrianapps/rate-limit";
+} from "@lyrianappsdev/rate-limit";
 export {
   MemoryStore,
   RedisStore,
   rateLimit,
   createRateLimiter,
   rateLimiters,
-} from "@lyrianapps/rate-limit";
+} from "@lyrianappsdev/rate-limit";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

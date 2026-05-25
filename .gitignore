@@ -11,5 +11,7 @@ dist/
 # TypeScript
 *.tsbuildinfo
 
-# OS
-.DS_Store
+# env / secrets
+.env*
+.npmrc
+

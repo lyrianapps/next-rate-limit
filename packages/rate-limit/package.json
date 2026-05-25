@@ -1,5 +1,5 @@
 {
-  "name": "@lyrianapps/rate-limit",
+  "name": "@lyrianappsdev/rate-limit",
   "version": "0.1.0",
   "description": "Framework-agnostic rate limiting primitives — zero runtime dependencies.",
   "keywords": [
@@ -28,7 +28,6 @@
     "dist"
   ],
   "publishConfig": {
-    "registry": "https://your-artifactory-instance/artifactory/api/npm/npm-local/",
     "access": "public"
   },
   "scripts": {

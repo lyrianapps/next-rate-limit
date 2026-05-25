@@ -1,5 +1,5 @@
 // =============================================================================
-// @lyrianapps/rate-limit
+// @lyrianappsdev/rate-limit
 //
 // Framework-agnostic rate limiting primitives. Zero runtime dependencies.
 //
@@ -266,7 +266,7 @@ export function createRateLimiter(
 // Key namespacing: each preset uses a unique prefix so limiters can't
 // interfere with each other even when sharing a store (e.g. `api:` vs `auth:`).
 
-/** @internal Exported so @lyrianapps/rate-limit-nextjs can share this instance as a default. */
+/** @internal Exported so @lyrianappsdev/rate-limit-nextjs can share this instance as a default. */
 export const _defaultStore = new MemoryStore();
 
 export const rateLimiters = {

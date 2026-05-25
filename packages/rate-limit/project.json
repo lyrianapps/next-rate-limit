@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "@lyrianapps/rate-limit",
+  "name": "@lyrianappsdev/rate-limit",
   "projectType": "library",
   "sourceRoot": "packages/rate-limit/src",
   "tags": ["scope:core", "type:library"]
