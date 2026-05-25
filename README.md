@@ -1,29 +1,19 @@
-# `@lyrianapps/rate-limit` + `@lyrianapps/rate-limit-nextjs`
+# @lyrianapps/rate-limit
 
-Fixed-window rate limiting for Next.js App Router. Two packages:
+Fixed-window rate limiting for Next.js App Router, built as two publishable packages:
 
-| Package | Purpose |
-|---|---|
-| `@lyrianapps/rate-limit` | Framework-agnostic core. Zero runtime dependencies. |
-| `@lyrianapps/rate-limit-nextjs` | Next.js App Router adapter. Re-exports everything from core. |
-
----
+- **`@lyrianapps/rate-limit`** — framework-agnostic core, zero runtime dependencies
+- **`@lyrianapps/rate-limit-nextjs`** — Next.js App Router adapter, re-exports everything from core
 
 ## Installation
 
 ```bash
-# In your Next.js app — just install the adapter (it re-exports the core)
 npm install @lyrianapps/rate-limit-nextjs
-
-# For production Redis support, add ioredis as well
+# Production Redis support
 npm install ioredis
 ```
 
----
-
 ## Quick start
-
-### Wrap a route handler
 
 ```ts
 // app/api/hello/route.ts
@@ -35,32 +25,29 @@ export const GET = withRateLimit(async (request) => {
 });
 ```
 
-Defaults: **60 requests per 60 seconds**, keyed by `x-forwarded-for` / `x-real-ip`. Every response gets `X-RateLimit-*` headers. Exceeded requests get a `429` with a `Retry-After` header.
-
----
+Defaults to **60 req / 60 s**, keyed by IP. All responses include `X-RateLimit-*` headers. Exceeded requests return `429` with a `Retry-After` header.
 
 ## Stores
 
-### `MemoryStore` — development only
+### MemoryStore — development only
 
 ```ts
 import { MemoryStore } from "@lyrianapps/rate-limit-nextjs";
-
 const store = new MemoryStore();
 ```
 
-> **⚠️ Do not use in production.** State resets on every cold start and is not shared across Cloud Run / serverless instances. The effective limit becomes `limit × N instances`.
+> **⚠️ Not for production.** State is not shared across instances — the effective limit becomes `limit × N instances`.
 
-### `RedisStore` — production
+### RedisStore — production
 
 ```ts
-// lib/rate-limit-store.ts  (Next.js singleton pattern)
+// lib/rate-limit-store.ts
 import Redis from "ioredis";
 import { RedisStore } from "@lyrianapps/rate-limit-nextjs";
 
 const redis = new Redis(process.env.REDIS_URL!, {
-  lazyConnect: true,         // don't connect at module load (cold start)
-  enableOfflineQueue: false, // fail fast instead of queuing on disconnect
+  lazyConnect: true,
+  enableOfflineQueue: false,
   connectTimeout: 2_000,
   commandTimeout: 2_000,
 });
@@ -72,144 +59,85 @@ export const store = new RedisStore(redis);
 // app/api/hello/route.ts
 import { withRateLimit } from "@lyrianapps/rate-limit-nextjs";
 import { store } from "@/lib/rate-limit-store";
-import { NextResponse } from "next/server";
 
-export const POST = withRateLimit(
-  async (request) => {
-    return NextResponse.json({ message: "ok" });
-  },
-  { store, limit: 20, windowMs: 60_000 },
-);
+export const POST = withRateLimit(handler, { store, limit: 20, windowMs: 60_000 });
 ```
 
-**SIGTERM / graceful shutdown** — add to your server entrypoint, not in route files:
+Add to your server entrypoint for graceful shutdown:
 
 ```ts
-process.once("SIGTERM", async () => {
-  await store.close();
-  process.exit(0);
-});
+process.once("SIGTERM", async () => { await store.close(); process.exit(0); });
 ```
-
----
 
 ## `withRateLimit` options
 
-```ts
-withRateLimit(handler, options?)
-```
+| Option     | Type                                  | Default       | Description             |
+| ---------- | ------------------------------------- | ------------- | ----------------------- |
+| `store`    | `RateLimitStore`                      | `MemoryStore` | Storage backend         |
+| `limit`    | `number`                              | `60`          | Max requests per window |
+| `windowMs` | `number`                              | `60_000`      | Window duration in ms   |
+| `keyFn`    | `(req: NextRequest) => string`        | IP address    | Key derivation          |
+| `onError`  | `(err: unknown) => 'allow' \| 'deny'` | `'allow'`     | Store error behaviour   |
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `store` | `RateLimitStore` | `MemoryStore` | Storage backend |
-| `limit` | `number` | `60` | Max requests per window |
-| `windowMs` | `number` | `60_000` | Window size in milliseconds |
-| `keyFn` | `(req: NextRequest) => string` | IP address | Key derivation function |
-| `onError` | `(err: unknown) => 'allow' \| 'deny'` | `() => 'allow'` | Store error handler |
-
-### Custom key — rate limit by user ID
+**Custom key:**
 
 ```ts
 export const POST = withRateLimit(handler, {
   store,
-  limit: 10,
-  windowMs: 60_000,
-  keyFn: (req) => {
-    // pull userId from a verified JWT/session header
-    return req.headers.get("x-user-id") ?? req.headers.get("x-forwarded-for") ?? "unknown";
-  },
+  keyFn: (req) => req.headers.get("x-user-id") ?? "unknown",
 });
 ```
 
-### Error handling — fail open vs fail closed
+**Fail closed on Redis errors:**
 
 ```ts
 export const POST = withRateLimit(handler, {
   store,
-  onError: (err) => {
-    console.error("[rate-limit] store error:", err);
-    return "allow"; // let the request through when Redis is down
-    // return "deny"; // return 429 when Redis is down (strict mode)
-  },
+  onError: (err) => { console.error(err); return "deny"; },
 });
 ```
 
----
-
-## Using the core directly (framework-agnostic)
+## Core API (framework-agnostic)
 
 ```ts
-import { rateLimit, RedisStore, createRateLimiter } from "@lyrianapps/rate-limit";
+import { rateLimit, createRateLimiter } from "@lyrianapps/rate-limit";
 
 // One-off check
 const result = await rateLimit(store, `ip:${ip}`, { limit: 60, windowMs: 60_000 });
+if (result.limited) return new Response("Too many requests", { status: 429 });
 
-if (result.limited) {
-  return new Response("Too many requests", { status: 429 });
-}
-
-// Pre-configured limiter — define once, call anywhere
+// Reusable limiter
 const authLimiter = createRateLimiter(store, { limit: 10, windowMs: 60_000 });
 const result = await authLimiter(`login:${ip}`);
 ```
 
-### `RateLimitResult`
+`RateLimitResult`:
 
-```ts
-interface RateLimitResult {
-  limited: boolean;   // true if the request should be blocked
-  remaining: number;  // requests left in the current window
-  resetAt: Date;      // when the window resets
-  count: number;      // total requests seen in this window
-}
-```
-
----
-
-## Preset limiters
-
-A convenience object of pre-configured limiters backed by a shared `MemoryStore`. **Development only.**
-
-```ts
-import { rateLimiters } from "@lyrianapps/rate-limit-nextjs";
-
-const result = await rateLimiters.api(ip);      // 60 req / 60s
-const result = await rateLimiters.auth(ip);     // 10 req / 60s
-const result = await rateLimiters.expensive(userId); // 5 req / 60s
-```
-
-Replace with a `RedisStore`-backed `createRateLimiter` in production.
-
----
+| Field       | Type      | Description                           |
+| ----------- | --------- | ------------------------------------- |
+| `limited`   | `boolean` | Whether the request should be blocked |
+| `remaining` | `number`  | Requests left in the window           |
+| `resetAt`   | `Date`    | When the window resets                |
+| `count`     | `number`  | Total requests in this window         |
 
 ## Response headers
 
-Every response from `withRateLimit` includes:
+| Header                  | Description                            |
+| ----------------------- | -------------------------------------- |
+| `X-RateLimit-Limit`     | Max requests allowed                   |
+| `X-RateLimit-Remaining` | Requests left                          |
+| `X-RateLimit-Reset`     | Unix timestamp (s) of window reset     |
+| `Retry-After`           | Seconds to wait — `429` responses only |
 
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Max requests allowed |
-| `X-RateLimit-Remaining` | Requests left in the window |
-| `X-RateLimit-Reset` | Unix timestamp (seconds) when the window resets |
-| `Retry-After` | Seconds to wait (only on `429` responses) |
-
----
-
-## Implementing a custom store
+## Custom store
 
 ```ts
 import type { RateLimitStore } from "@lyrianapps/rate-limit";
 
-export class MyCustomStore implements RateLimitStore {
+class MyStore implements RateLimitStore {
   async increment(key: string, windowMs: number) {
-    // atomically increment and return { count, resetAt }
     return { count: 1, resetAt: Date.now() + windowMs };
   }
-
-  async close() {
-    // clean up connections / timers
-  }
+  async close() {}
 }
 ```
-# next-rate-limit
-# next-rate-limit
