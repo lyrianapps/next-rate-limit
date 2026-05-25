@@ -1,5 +1,8 @@
 # @lyrianappsdev/rate-limit
 
+[![npm](https://img.shields.io/npm/v/@lyrianappsdev/rate-limit?label=%40lyrianappsdev%2Frate-limit)](https://www.npmjs.com/package/@lyrianappsdev/rate-limit)
+[![npm](https://img.shields.io/npm/v/@lyrianappsdev/rate-limit-nextjs?label=%40lyrianappsdev%2Frate-limit-nextjs)](https://www.npmjs.com/package/@lyrianappsdev/rate-limit-nextjs)
+
 Fixed-window rate limiting for Next.js App Router, built as two publishable packages:
 
 - **`@lyrianappsdev/rate-limit`** — framework-agnostic core, zero runtime dependencies

@@ -2,6 +2,7 @@
   "name": "@lyrianappsdev/rate-limit",
   "version": "0.1.0",
   "description": "Framework-agnostic rate limiting primitives — zero runtime dependencies.",
+  "homepage": "https://www.npmjs.com/package/@lyrianappsdev/rate-limit",
   "keywords": [
     "rate-limit",
     "redis",
