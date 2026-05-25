@@ -1,0 +1,26 @@
+{
+  "name": "rate-limit-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "nx run-many --target=build",
+    "dev": "nx run-many --target=dev",
+    "typecheck": "nx run-many --target=typecheck",
+    "lint": "nx run-many --target=lint",
+    "affected:build": "nx affected --target=build",
+    "affected:typecheck": "nx affected --target=typecheck",
+    "graph": "nx graph",
+    "release": "nx release",
+    "release:version": "nx release version",
+    "release:publish": "nx release publish"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "nx": "^20.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}
