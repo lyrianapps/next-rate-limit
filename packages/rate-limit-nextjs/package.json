@@ -1,6 +1,6 @@
 {
   "name": "@lyrianappsdev/rate-limit-nextjs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Next.js App Router adapter for @lyrianappsdev/rate-limit.",
   "homepage": "https://www.npmjs.com/package/@lyrianappsdev/rate-limit-nextjs",
   "keywords": [
